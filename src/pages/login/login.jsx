@@ -1,198 +1,105 @@
 import React, { useState } from "react";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import GitHubIcon from "@mui/icons-material/GitHub";
+import { FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { useNavigate } from "react-router-dom";
 import {
   Button,
-  TextField,
-  Container,
+  Divider,
+  Grid,
   Typography,
   Box,
   FormControlLabel,
   Checkbox,
   Link,
-  IconButton,
 } from "@mui/material";
+import MyForm from "../../component/formInput";
 
 const Login = () => {
-  const [emailOrUsername, setEmailOrUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const navigate = useNavigate();
+  const [formdata, setFormData] = useState({
+    email: '',
+    password: ''
+  })
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    if (!emailOrUsername) {
-      setEmailError("Username or email is required");
-      return; // Exit early if validation fails
-    } else {
-      setEmailError("");
-    }
-
-    if (!password) {
-      setPasswordError("Password is required");
-      return; // Exit early if validation fails
-    } else {
-      setPasswordError("");
-    }
-
-    // Proceed with your login logic here using emailOrUsername and password
-    console.log('data: ', emailOrUsername, password);
-
-    // Example: Navigate to home page after successful login
-    navigate('/home');
-  };
-
-  const handleGoogleSignIn = () => {
-    // Handle Google sign-in logic here
-    console.log("Google sign-in clicked");
-  };
+  const hanleChanged = (e) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formdata,
+      [id]: value
+    })
+  }
 
   return (
-    <Container
-      component="main"
-      maxWidth="xs"
-      sx={{
-        padding: "16px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        // background: "linear-gradient(to right, #18A5A7, #BFFFC7)",
-      }}
-    >
+    <Box height="auto"
+      sx={{ ml: 'auto', mr: "auto", pr: "15px", pl: "15px", pt: "50px" }}>
       <Box
-        sx={{
-          padding: "30px",
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          border: "2px solid #00CC00",
-          background: "white",
-          borderRadius: "12px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <Typography component="h1" variant="h4">
-          Login
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="emailOrUsername"
-            label="Email or Username"
-            name="emailOrUsername"
-            autoComplete="emailOrUsername"
-            autoFocus
-            value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
-            error={!!emailError}
-            helperText={emailError}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!passwordError}
-            helperText={passwordError}
-          />
-          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            <FormControlLabel
-              sx={{ display: "flex", fontSize: "16px" }}
-              control={
-                <Checkbox
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  name="rememberMe"
-                  color="primary"
-                />
-              }
-              label={
-                <Typography sx={{ fontSize: "16px", fontWeight: "bold" }}>
-                  Remember Me
-                </Typography>
-              }
-            />
-            <Typography sx={{ pl: "28%", fontSize: "16px" }}>
-              <Link
-                href="#"
-                sx={{
-                  color: "black",
-                  textDecoration: "none",
-                }}
-              >
-                Forgot password?
-              </Link>
-            </Typography>
-          </Box>
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Sign In
+        maxWidth="525px" flexDirection={"column"} gap={2}
+        display="flex" p={4} sx={{ backgroundColor: '#eaeded', m: "0 auto 50px", p: "30px 50px 25px" }}>
+        <Box display="flex" gap={1.5}>
+          <Typography sx={{ color: 'green', fontSize: 20, fontWeight: 700 }}>Login</Typography>
+          <Typography sx={{ mt: '4px' }}>with social account</Typography>
+        </Box>
+        <Box width='100%' display='flex' justifyContent='center' alignItems='center' gap={2}>
+          <Button variant="outlined" sx={{ flexGrow: 1, borderColor: 'black', height: '40px', fontSize: 25 }}>
+            <FcGoogle />
           </Button>
-          <Box sx={{ justifyContent: "center", display: "flex", mt: 2 }}>
-            <Typography sx={{ fontSize: "16px", textAlign: "center" }}>
-              or login with
-            </Typography>
-          </Box>
-          <Box sx={{ justifyContent: "center", display: "flex", mt: 1 }}>
-            <IconButton>
-              <FacebookIcon sx={{ fontSize: "32px", color: "#1877F2" }} />
-            </IconButton>
-            <IconButton onClick={handleGoogleSignIn}>
-              <FcGoogle
-                style={{
-                  fontSize: "32px",
-                  color: "#DB4437",
-                  paddingLeft: "10px",
-                }}
-              />
-            </IconButton>
-            <IconButton>
-              <GitHubIcon sx={{ fontSize: "32px", color: "#333333", marginLeft: "10px" }} />
-            </IconButton>
-          </Box>
-          <Box sx={{ justifyContent: "center", display: "flex", mt: 1 }}>
-            <Typography>
-              <Link
-                href="#"
-                sx={{
-                  pt: "10px",
-                  textDecoration: "none",
-                  fontSize: "16px",
-                  color: "black",
-                }}
-              >
-                Not registered? Create account
-              </Link>
-            </Typography>
-          </Box>
+          <Button variant="contained" sx={{ flexGrow: 1, height: '40px', fontSize: 21 }}>
+            <FaFacebookF />
+          </Button>
+        </Box>
+        <Divider sx={{ my: 1, width: '100%', color: 'black' }}>
+          <Typography sx={{ color: 'green', fontSize: 20 }}>or</Typography>
+        </Divider>
+        <Grid container spacing={5}>
+          <Grid item xs={12}>
+            <MyForm id="email" label="Email" type="email" value={formdata.email} onChange={hanleChanged} />
+          </Grid>
+          <Grid item xs={12}>
+            <MyForm id="password" label="Password" type="password" value={formdata.password} onChange={hanleChanged}/>
+          </Grid>
+        </Grid>
+        <Box display="flex" justifyContent="space-between">
+          <FormControlLabel control={<Checkbox
+            sx={{
+              color: 'black',
+              '&.Mui-checked': { color: 'green' },
+              '&:hover': { color: 'green' },
+
+            }} />}
+            label="Remember me" />
+          <Link
+            href="/forgot-password"
+            sx={{
+              color: 'green', fontSize: 16, fontFamily: "", mt: '8px', textDecorationColor: 'black'
+            }}>
+            Forgot password?
+          </Link>
+        </Box>
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <Button variant="contained" type="submit"
+            sx={{
+              flexGrow: 1,
+              height: '56px',
+              fontSize: 20,
+              backgroundColor: 'green',
+              '&:hover': {
+                backgroundColor: 'darkgreen'
+              }
+            }}>
+            Login
+          </Button>
+        </Box>
+        <Box display='flex' gap={0.5} justifyContent="center" >
+          <Typography sx={{ mt: '5px' }}>Not a member yet? </Typography>
+          <Link
+            href="/register"
+            sx={{
+              color: 'green', fontSize: 16, fontFamily: "", mt: '8px', textDecorationColor: 'green'
+            }}>
+            Register
+          </Link>
         </Box>
       </Box>
-    </Container>
+    </Box>
   );
-};
+}
 
 export default Login;

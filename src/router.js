@@ -6,6 +6,7 @@ import ProfileUser from "./pages/users/profile";
 import MasterLayout from "./pages/masterLayout";
 import Login from "./pages/login/login";
 import Register from "./pages/register/register";
+import ForgotPassword from "./pages/forgotPassword/forgotPassword";
 
 const renderUserRouter = () => {
   const userRouter = [
@@ -24,6 +25,10 @@ const renderUserRouter = () => {
     {
       path: "/register", // Đường dẫn cho trang Register
       component: <Register />
+    },
+    {
+      path: "/forgot-password", // Đường dẫn cho trang 404
+      component: <ForgotPassword />
     }
   ];
 

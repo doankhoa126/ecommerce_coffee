@@ -14,6 +14,8 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Menu, MenuItem } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useNavigate } from 'react-router-dom';
+
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
@@ -77,6 +79,7 @@ const Header = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const navigate = useNavigate();
 
     const handleClickMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -85,6 +88,10 @@ const Header = () => {
     const handleCloseMenu = () => {
         setAnchorEl(null);
     };
+
+    const handleLoginClick = () => {
+        navigate('/login');
+      };
 
     return (
         <Box>
@@ -168,7 +175,7 @@ const Header = () => {
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: isMobile ? '10px' : 0 }}>
-                    <IconButton>
+                    <IconButton onClick={handleLoginClick}>
                         <AccountCircleIcon sx={{ fontSize: '40px', color: '#006F45' }} />
                     </IconButton>
                     <IconButton size="large" aria-label="show 4 new mails" color="inherit">
