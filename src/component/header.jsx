@@ -92,11 +92,20 @@ const Header = () => {
     const handleLoginClick = () => {
         navigate('/login');
       };
+    const handleLogoClick =()=>{
+        navigate('/home/1');
+    }
 
+<<<<<<< HEAD
     const handleShoppingCart = () => {
         navigate('/OrderCheckout');
     }
 
+=======
+    const handleCardShopping =() =>{
+        navigate('/shopping-card');
+    }
+>>>>>>> 3a0ebbecbd242a9887e25fbc45b6a4bcbff4b48b
     return (
         <Box>
             <Box
@@ -125,7 +134,10 @@ const Header = () => {
                     flexDirection: isMobile ? 'column' : 'row',
                 }}
             >
-                <Box
+                <Button onClick={handleLogoClick}>
+
+               
+                <Box 
                     component="img"
                     src="https://asplynrorebnsajukbnu.supabase.co/storage/v1/object/public/image_coffee_web/logo.png?t=2024-06-19T08%3A15%3A42.427Z"
                     alt="Logo"
@@ -148,7 +160,7 @@ const Header = () => {
                         marginBottom: isMobile ? '10px' : 0,
                     }}
                 />
-
+               </Button>
                 <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, width: 'auto' }}>
                     <Search sx={{ backgroundColor: `#F4F4F4`, flexGrow: 1 }}>
                         <SearchIconWrapper>
@@ -187,7 +199,11 @@ const Header = () => {
                             <FavoriteBorderIcon sx={{ fontSize: '40px', color: '#006F45' }} />
                         </Badge>
                     </IconButton>
+<<<<<<< HEAD
                     <IconButton onClick={handleShoppingCart} size="large" aria-label="show 4 new mails" color="inherit">
+=======
+                    <IconButton size="large" aria-label="show 4 new mails" color="inherit" onClick={handleCardShopping}>
+>>>>>>> 3a0ebbecbd242a9887e25fbc45b6a4bcbff4b48b
                         <Badge badgeContent={4} color="error">
                             <ShoppingBagIcon sx={{ fontSize: '40px', color: '#006F45' }} />
                         </Badge>

@@ -6,26 +6,41 @@ import Typography from '@mui/material/Typography';
 import { Box, CardActionArea, Grid, Pagination } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
     const [products, setProducts] = React.useState([]);
+    const [totalProducts, setTotalProducts] = React.useState(0);
     const [error, setError] = React.useState(null);
-    const { page } = useParams(); // Lấy page từ URL
-    const [currentPage, setCurrentPage] = React.useState(parseInt(page || '1')); // Lưu trữ trang hiện tại
+    const { pageParams } = useParams();
+    const navigate = useNavigate();
 
-    const perPage = 3; // Number of products to load per page
+    // Default values
+    let currentPage = 1;
+    let perPage = 3;
+
+    if (pageParams) {
+        const params = pageParams.split('&').map(Number);
+        if (params.length === 2) {
+            currentPage = params[0];
+            perPage = params[1];
+        }
+    }
 
     React.useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch(`http://192.168.1.36:3000/api/products/getProducts?page=${currentPage}&perPage=${perPage}`);
+                const response = await fetch(`http://192.168.1.36:3000/api/products/getAllProducts?page=${currentPage}&perPage=${perPage}`);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
+                
                 const data = await response.json();
+             
                 if (data.message === "Product found" && Array.isArray(data.products)) {
                     setProducts(data.products);
+                    setTotalProducts(data.total_product || 0);
                 } else {
                     throw new Error('Unexpected response format');
                 }
@@ -34,19 +49,22 @@ export default function HomePage() {
                 console.error('Error fetching data:', error);
             }
         };
-
+    
         fetchProducts();
-    }, [currentPage]);
+    }, [currentPage, perPage]);
+    
+    
 
     function formatPrice(price) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     }
 
     const handlePageChange = (event, value) => {
-        setCurrentPage(value); // Cập nhật trang hiện tại khi thay đổi trang
+        navigate(`/home/${value}&${perPage}`);
     };
-
+    
     return (
+        
         <Box sx={{ width: "80%", margin: "0 auto", mb: "40px" }}>
             <Box component="img"
                 src="https://asplynrorebnsajukbnu.supabase.co/storage/v1/object/public/image_coffee_web/slideshow.webp?t=2024-06-20T03%3A41%3A26.881Z"
@@ -77,8 +95,8 @@ export default function HomePage() {
                                     <CardActionArea>
                                         <CardMedia
                                             component="img"
-                                            sx={{ height: 200 }} // Fixed height for images
-                                            image={product.imgURL || 'default-image-url.jpg'} // Use a default image if imgURL is null
+                                            sx={{ height: 200 }}
+                                            image={product.imgURL || 'default-image-url.jpg'}
                                             alt={product.name || 'No name available'}
                                         />
                                         <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
@@ -100,9 +118,11 @@ export default function HomePage() {
                             </Grid>
                         ))}
                     </Grid>
+                   
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 2 }}>
                         <Pagination
-                            count={Math.ceil(products.length / perPage)}
+                            count={Math.ceil(totalProducts / perPage)}
+                            
                             page={currentPage}
                             onChange={handlePageChange}
                             color="primary"
