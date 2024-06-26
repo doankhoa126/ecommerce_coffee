@@ -36,7 +36,6 @@ export async function findUserByUsername(username) {
         if (user.length > 1) {
             throw new Error('Multiple users found with the same username');
         }
-        console.log(user);
 
         return user[0];
     } catch (error) {

@@ -1,4 +1,4 @@
-import { addUser, findUserByUsername, updateUserPassword } from "../models/user.js";
+import { addUser, findUserByUsername, updateUserPassword } from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -7,7 +7,7 @@ export const registerUser = async (req, res) => {
 
     const usernameDB = await findUserByUsername(username);
 
-    if (usernameDB.length > 0)  {
+    if (usernameDB.length > 0) {
         return res.status(409).json({ message: 'Username already exists' });
     }
 
@@ -32,15 +32,26 @@ export const registerUser = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, rememberMe } = req.body;
 
+    const userID = req.cookies.userID;
+    console.log(userID)
+
+    // Check if user is already logged in
+    if (userID) {
+        const token = jwt.sign({ id: userID }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        req.session.userID = userID;
+        console.log('User is already logged in')
+        return res.json({ message: 'User is already logged in', token, userID });
+    }
+
+    // Validate username and password for new login attempt
     if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
     }
 
     try {
         const user = await findUserByUsername(username);
-        console.log(user.password)
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -59,8 +70,6 @@ export const loginUser = async (req, res) => {
 
         // Compare the plaintext password with the hashed password
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log(password + '   ' + user.password)
-        console.log(isPasswordValid + 'isPasswordValid')
 
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid credentials' });
@@ -68,15 +77,27 @@ export const loginUser = async (req, res) => {
 
         // Generate a JWT token
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        // set cookie 
-        res.cookie('userID', user.id, { maxAge: 3600000 })
 
+        // Set cookie if rememberMe is checked
+        if (rememberMe) {
+            console.log('Setting cookie for user: ', user.id);
+            res.cookie('userID', user.id, {
+                maxAge: 3600000 * 24, // 24 hours expiration
+                httpOnly: true, // Only accessible via HTTP(S)
+                sameSite: 'none', // Adjust based on your requirements
+                secure: true // Recommend for production use over HTTPS
+            });
+        }
+
+        req.session.userID = user.id;
         res.json({ message: 'Login successful', token });
+
     } catch (error) {
         console.error('Error logging in:', error.message);
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }
-}
+};
+
 
 export const forgotPassword = async (req, res) => {
     const { username, newPassword } = req.body;

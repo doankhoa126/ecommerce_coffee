@@ -1,7 +1,26 @@
 import supabase from '../config/connectDB.js'
 
-export async function getAllProducts(currentPage, itemsPerPage) {
+export async function getAllProducts() {
     try {
+        const { data: all_product, err } = await supabase
+            .from('product')
+            .select()
+        if (err) {
+            throw err
+        }
+        if (all_product.length === 0) {
+            throw new Error('No products')
+        }
+        const totalProducts = all_product.length
+        return totalProducts
+    } catch (error) {
+        console.error("Error getting all products" + error.message)
+    }
+}
+
+export async function getProductsInPage(currentPage, itemsPerPage) {
+    try {
+
         const { data, error } = await supabase
             .from('product')
             .select()

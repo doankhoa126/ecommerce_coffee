@@ -1,4 +1,4 @@
-import { getAllProducts, getProductById } from "../models/product.js"
+import { getAllProducts, getProductById, getProductsInPage } from "../models/productModel.js"
 
 export const getProducts = async (req, res) => {
     try {
@@ -7,11 +7,16 @@ export const getProducts = async (req, res) => {
         const currentPage = parseInt(page);
         const itemsPerPage = parseInt(perPage);
 
-        const products = await getAllProducts(currentPage, itemsPerPage);
+        const products = await getProductsInPage(currentPage, itemsPerPage);
+        const total = await getAllProducts();
+        if (total.length === 0) {
+            return res.status(404).json({ message: "No all products found" });
+        }
         if (products.length === 0) {
             return res.status(404).json({ message: "No products found" });
         }
-        return res.status(200).json({ message: "Product found", products: products });
+        
+        return res.status(200).json({ message: "Product found",total_product: total, products: products });
     } catch (error) {
         res.status(500).json({ message: "Error getting products", error });
     }
