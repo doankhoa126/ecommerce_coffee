@@ -2,7 +2,12 @@ import { getAllProducts, getProductById } from "../models/product.js"
 
 export const getProducts = async (req, res) => {
     try {
-        const products = await getAllProducts();
+        // Extract pagination parameters from query string
+        const { page = 1, perPage = 10 } = req.query;
+        const currentPage = parseInt(page);
+        const itemsPerPage = parseInt(perPage);
+
+        const products = await getAllProducts(currentPage, itemsPerPage);
         if (products.length === 0) {
             return res.status(404).json({ message: "No products found" });
         }

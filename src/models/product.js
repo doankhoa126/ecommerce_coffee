@@ -1,10 +1,12 @@
 import supabase from '../config/connectDB.js'
 
-export async function getAllProducts() {
+export async function getAllProducts(currentPage, itemsPerPage) {
     try {
         const { data, error } = await supabase
             .from('product')
             .select()
+            .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
+            .order('id', { ascending: true });
 
         if (error) {
             throw error;

@@ -22,17 +22,25 @@ export async function findUserByUsername(username) {
     try {
         const { data: user, error } = await supabase
             .from('user')
-            .select('*')
+            .select('')
             .eq('username', username)
-            .single();
 
         if (error) {
             throw error;
         }
 
-        return user;
+        if (!user || user.length === 0) {
+            return null; // No user found
+        }
+
+        if (user.length > 1) {
+            throw new Error('Multiple users found with the same username');
+        }
+        console.log(user);
+
+        return user[0];
     } catch (error) {
-        console.error("Error finding user by usernamr:", error.message);
+        console.error("Error finding user by username:", error.message);
         throw error;
     }
 }

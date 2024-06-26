@@ -3,7 +3,7 @@ import { forgotPassword, loginUser, registerUser } from '../controller/authUser.
 
 const router = express.Router()
 
-router.get('/login', loginUser)
+router.post('/login', loginUser)
 router.post('/register', registerUser)
 router.post('/forgotPassword', forgotPassword)
 

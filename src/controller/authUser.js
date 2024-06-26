@@ -3,29 +3,31 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export const registerUser = async (req, res) => {
-    const { fullname, username, password, email, phone, birthday } = req.body;
+    const { fullname, gender, username, password, email, phone, birthday } = req.body;
 
-    const usernameDB = findUserByUsername(username);
+    const usernameDB = await findUserByUsername(username);
 
-    if (usernameDB) {
+    if (usernameDB.length > 0)  {
         return res.status(409).json({ message: 'Username already exists' });
-    } else {
-        const data = {
-            fullname: fullname,
-            username: username,
-            password: await bcrypt.hash(password, 10),
-            email: email,
-            phone: phone,
-            birthday: birthday
-        }
-        try {
-            const newUser = await addUser(data)
-            res.status(201).json({ message: 'User registered successfully', user: newUser });
-
-        } catch (error) {
-            res.status(500).json({ message: 'Error registering user', error });
-        }
     }
+
+    const data = {
+        fullname: fullname,
+        username: username,
+        gender: gender,
+        password: await bcrypt.hash(password, 10),
+        email: email,
+        phone: phone,
+        birthday: birthday
+    }
+    try {
+        const newUser = await addUser(data)
+        res.status(201).json({ message: 'User registered successfully', user: newUser });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error registering user', error });
+    }
+
 
 }
 
@@ -38,13 +40,27 @@ export const loginUser = async (req, res) => {
 
     try {
         const user = await findUserByUsername(username);
+        console.log(user.password)
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        if (typeof user.password !== 'string') {
+            console.error('Invalid password format in database:', user.password);
+            throw new Error('Invalid password format in database');
+        }
+
+        // Ensure the plain password is a string
+        if (typeof password !== 'string') {
+            console.error('Invalid password format from request:', password);
+            throw new Error('Invalid password format from request');
+        }
+
         // Compare the plaintext password with the hashed password
         const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log(password + '   ' + user.password)
+        console.log(isPasswordValid + 'isPasswordValid')
 
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid credentials' });
