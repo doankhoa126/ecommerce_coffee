@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
 import {
   Button,
   Divider,
@@ -13,9 +14,11 @@ import {
 } from "@mui/material";
 import MyForm from "../../component/formInput";
 
+// axios.defaults.baseURL = "http://localhost:3000"
+
 const Login = () => {
   const [formdata, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   })
 
@@ -25,6 +28,27 @@ const Login = () => {
       ...formdata,
       [id]: value
     })
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const data = {
+      username: formdata.username,
+      password: formdata.password,
+    }
+
+    console.log(data)
+
+    axios.post('http://localhost:3000/api/users/login', data)
+      .then((response) => {
+        alert("Login successful")
+        console.log(response.data)
+      })
+      .catch(err => {
+        alert("Login failed: " + err.message)
+        console.log(err)
+      })
   }
 
   return (
@@ -50,10 +74,10 @@ const Login = () => {
         </Divider>
         <Grid container spacing={5}>
           <Grid item xs={12}>
-            <MyForm id="email" label="Email" type="email" value={formdata.email} onChange={hanleChanged} />
+            <MyForm id="username" name="username" label="Username"  value={formdata.email} onChange={hanleChanged} />
           </Grid>
           <Grid item xs={12}>
-            <MyForm id="password" label="Password" type="password" value={formdata.password} onChange={hanleChanged}/>
+            <MyForm id="password" name="password" label="Password" type="password" value={formdata.password} onChange={hanleChanged} />
           </Grid>
         </Grid>
         <Box display="flex" justifyContent="space-between">
@@ -74,7 +98,7 @@ const Login = () => {
           </Link>
         </Box>
         <Box display="flex" justifyContent="center" alignItems="center">
-          <Button variant="contained" type="submit"
+          <Button variant="contained" type="submit" onClick={handleSubmit}
             sx={{
               flexGrow: 1,
               height: '56px',
