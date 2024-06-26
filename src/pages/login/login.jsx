@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
+
 import {
   Button,
   Divider,
@@ -19,14 +21,17 @@ import MyForm from "../../component/formInput";
 const Login = () => {
   const [formdata, setFormData] = useState({
     username: '',
-    password: ''
+    password: '',
+    rememberMe: false,
   })
+  const navigate = useNavigate()
+
 
   const hanleChanged = (e) => {
-    const { id, value } = e.target;
+    const { id, value, checked } = e.target;
     setFormData({
       ...formdata,
-      [id]: value
+      [id]: id === "checkbox" ? checked : value
     })
   }
 
@@ -36,14 +41,27 @@ const Login = () => {
     const data = {
       username: formdata.username,
       password: formdata.password,
+      rememberMe: formdata.rememberMe.toString()
     }
+    const userID = sessionStorage.getItem("userID")
 
-    console.log(data)
-
-    axios.post('http://localhost:3000/api/users/login', data)
+    axios.post('http://localhost:3000/api/users/login', data, {
+      withCredentials: true, // Include cookies in request
+      userID: userID,
+    },)
       .then((response) => {
-        alert("Login successful")
+        const userIDCookie = response.data.userID
         console.log(response.data)
+
+        if (userIDCookie) {
+          alert("User is already logged in");
+          console.log("Cookie received:", userIDCookie);
+        } else {
+          alert("Login successful");
+        }
+
+        console.log(response.data);
+        navigate("/home")
       })
       .catch(err => {
         alert("Login failed: " + err.message)
@@ -74,20 +92,25 @@ const Login = () => {
         </Divider>
         <Grid container spacing={5}>
           <Grid item xs={12}>
-            <MyForm id="username" name="username" label="Username"  value={formdata.email} onChange={hanleChanged} />
+            <MyForm id="username" name="username" label="Username" value={formdata.email} onChange={hanleChanged} />
           </Grid>
           <Grid item xs={12}>
             <MyForm id="password" name="password" label="Password" type="password" value={formdata.password} onChange={hanleChanged} />
           </Grid>
         </Grid>
         <Box display="flex" justifyContent="space-between">
-          <FormControlLabel control={<Checkbox
-            sx={{
-              color: 'black',
-              '&.Mui-checked': { color: 'green' },
-              '&:hover': { color: 'green' },
+          <FormControlLabel
+            control={<Checkbox
+              id="rememberMe"
+              name="rememberMe"
+              checked={formdata.rememberMe}
+              onChange={hanleChanged}
+              sx={{
+                color: 'black',
+                '&.Mui-checked': { color: 'green' },
+                '&:hover': { color: 'green' },
 
-            }} />}
+              }} />}
             label="Remember me" />
           <Link
             href="/forgot-password"

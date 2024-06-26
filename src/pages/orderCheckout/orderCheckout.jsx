@@ -7,6 +7,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const TAX_RATE = 0.07;
 
@@ -38,9 +41,53 @@ const invoiceTaxes = TAX_RATE * invoiceSubtotal;
 const invoiceTotal = invoiceTaxes + invoiceSubtotal;
 
 export default function OrderCheckout() {
+    const [rows, setRows] = useState([]);
+    const [invoiceSubtotal, setInvoiceSubtotal] = useState(0);
+    const [invoiceTaxes, setInvoiceTaxes] = useState(0);
+    const [invoiceTotal, setInvoiceTotal] = useState(0);
+
+    // const userIDCookie = Cookies.get('userID')
+    // const userIDCookie = 19
+    
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const userIDCookie = Cookies.get('userID')
+                console.log("cookie: " + userIDCookie);
+                const response = await axios.post('http://localhost:3000/api/order/shopping-cart', 
+                    { withCredentials: true }, 
+                    { userID: userIDCookie });
+
+                const data = response.data.carts;
+                console.log(data);
+
+                if (!Array.isArray(data)) {
+                    throw new Error('Returned data is not an array');
+                }
+
+                const fetchedRows = data.map(product =>
+                    createRow(product.name, product.quantity, product.price)
+                );
+                console.log(fetchedRows);
+                setRows(fetchedRows);
+                const subtotalValue = subtotal(fetchedRows);
+                const taxesValue = TAX_RATE * subtotalValue;
+                const totalValue = subtotalValue + taxesValue;
+                setInvoiceSubtotal(subtotalValue);
+                setInvoiceTaxes(taxesValue);
+                setInvoiceTotal(totalValue);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        fetchData();
+    }, []);
+
     return (
-        <Box sx={{height: '70vh', width: "80%",ml:"10%",mt:"4vh" }}>
-            <TableContainer component={Paper} sx ={{}}>
+        <Box sx={{ height: '70vh', width: "80%", ml: "10%", mt: "4vh" }}>
+            <TableContainer component={Paper} sx={{}}>
                 <Table sx={{ minWidth: 700 }} aria-label="spanning table">
                     <TableHead>
                         <TableRow>

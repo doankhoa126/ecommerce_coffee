@@ -93,6 +93,10 @@ const Header = () => {
         navigate('/login');
       };
 
+    const handleShoppingCart = () => {
+        navigate('/OrderCheckout');
+    }
+
     return (
         <Box>
             <Box
@@ -183,7 +187,7 @@ const Header = () => {
                             <FavoriteBorderIcon sx={{ fontSize: '40px', color: '#006F45' }} />
                         </Badge>
                     </IconButton>
-                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                    <IconButton onClick={handleShoppingCart} size="large" aria-label="show 4 new mails" color="inherit">
                         <Badge badgeContent={4} color="error">
                             <ShoppingBagIcon sx={{ fontSize: '40px', color: '#006F45' }} />
                         </Badge>
