@@ -7,7 +7,8 @@ import Login from "./pages/login/login";
 import Register from "./pages/register/register";
 import ForgotPassword from "./pages/forgotPassword/forgotPassword";
 import DetailProduct from "./pages/detaiProduct/detailProduct";
-import OrderCheckout from "./pages/orderCheckout/orderCheckout";
+import ShoppingCart from "./pages/shoppingCart/shoppingCart";
+import OrderCheckout from "./pages/orderCheckout/oderCheckout";
 
 const renderUserRouter = () => {
   const userRouter = [
@@ -34,6 +35,10 @@ const renderUserRouter = () => {
     {
       path: "/product-detail/:id",
       component: <DetailProduct />
+    },
+    {
+      path: "/shopping-card",
+      component: <ShoppingCart />
     },
     {
       path: "/order-checkout",
