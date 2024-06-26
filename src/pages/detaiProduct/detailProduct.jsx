@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Img = styled('img')({
   margin: 'auto',
@@ -33,7 +34,9 @@ const DetailProduct = () => {
   }, [id]);
 
   if (!product) {
-    return <Typography>Loading...</Typography>;
+    return <Box sx={{ display: 'flex' ,justifyContent:"center" }}>
+    <CircularProgress />
+  </Box>
   }
 
   return (

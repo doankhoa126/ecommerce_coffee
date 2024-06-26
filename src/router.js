@@ -12,7 +12,7 @@ import OrderCheckout from "./pages/orderCheckout/orderCheckout";
 const renderUserRouter = () => {
   const userRouter = [
     {
-      path: "/home",
+      path: "/home/:pageParams",
       component: <HomePage />
     },
     {
@@ -36,7 +36,7 @@ const renderUserRouter = () => {
       component: <DetailProduct />
     },
     {
-      path: "/OrderCheckout",
+      path: "/order-checkout",
       component: <OrderCheckout />
     }
     

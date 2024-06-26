@@ -50,9 +50,9 @@ export default function OrderCheckout() {
                             <TableCell align="right">Price</TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>Desc</TableCell>
-                            <TableCell align="right">Qty.</TableCell>
-                            <TableCell align="right">Unit</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell align="right">Quality</TableCell>
+                            <TableCell align="right">Action</TableCell>
                             <TableCell align="right">Sum</TableCell>
                         </TableRow>
                     </TableHead>
