@@ -52,7 +52,7 @@ export default function OrderCheckout() {
                         <TableRow>
                             <TableCell>Name</TableCell>
                             <TableCell align="right">Quality</TableCell>
-                            <TableCell align="right">Action</TableCell>
+                            <TableCell align="right">i</TableCell>
                             <TableCell align="right">Sum</TableCell>
                         </TableRow>
                     </TableHead>
