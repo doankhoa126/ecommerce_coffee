@@ -11,7 +11,26 @@ export async function addUser(newUser) {
         if (error) {
             throw error;
         }
-        return user;
+
+        // Check if user data is present and has an 'id'
+        if (!user || !user.length || !user[0].id) {
+            throw new Error('Failed to insert user or retrieve user ID');
+        }
+
+        const userID = user[0].id; // Assuming user[0].id is available after insertion
+
+        // Insert shopping cart for the user
+        const { data: shopping_cart, error: errAddCart } = await supabase
+            .from('shopping_cart')
+            .insert([{ user_id: userID }])
+            .select()
+
+        if (errAddCart) {
+            throw errAddCart;
+        }
+        console.log(user)
+        // Return the newly registered user and shopping cart data
+        return { user: user, shopping_cart };
     } catch (error) {
         console.error("Error adding user:", error.message);
         throw error;
@@ -22,22 +41,17 @@ export async function findUserByUsername(username) {
     try {
         const { data: user, error } = await supabase
             .from('user')
-            .select('')
+            .select()
             .eq('username', username)
 
         if (error) {
             throw error;
         }
 
-        if (!user || user.length === 0) {
+        if (!user) {
             return null; // No user found
         }
-
-        if (user.length > 1) {
-            throw new Error('Multiple users found with the same username');
-        }
-
-        return user[0];
+        return user;
     } catch (error) {
         console.error("Error finding user by username:", error.message);
         throw error;

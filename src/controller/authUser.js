@@ -5,55 +5,58 @@ import jwt from 'jsonwebtoken';
 export const registerUser = async (req, res) => {
     const { fullname, gender, username, password, email, phone, birthday } = req.body;
 
-    const usernameDB = await findUserByUsername(username);
-
-    if (usernameDB.length > 0) {
-        return res.status(409).json({ message: 'Username already exists' });
-    }
-
-    const data = {
-        fullname: fullname,
-        username: username,
-        gender: gender,
-        password: await bcrypt.hash(password, 10),
-        email: email,
-        phone: phone,
-        birthday: birthday
-    }
     try {
-        const newUser = await addUser(data)
-        res.status(201).json({ message: 'User registered successfully', user: newUser });
+
+        const usernameDB = await findUserByUsername(username);
+        console.log(usernameDB)
+
+        if (usernameDB.length > 0) {
+            return res.status(409).json({ message: 'Username already exists', user: usernameDB });
+        }
+
+        const data = {
+            fullname: fullname,
+            username: username,
+            gender: gender,
+            password: await bcrypt.hash(password, 10),
+            email: email,
+            phone: phone,
+            birthday: birthday
+        }
+
+        const newdata = await addUser(data)
+        console.log(newdata)
+        res.status(201).json({ message: 'User registered successfully', user: newdata.user, shoppingCart: newdata.shopping_cart });
 
     } catch (error) {
-        res.status(500).json({ message: 'Error registering user', error });
+        res.status(500).json({ message: 'Error registering user', error: error.message });
     }
-
-
 }
 
 export const loginUser = async (req, res) => {
     const { username, password, rememberMe } = req.body;
 
     const userID = req.cookies.userID;
-    console.log(userID)
-
-    // Check if user is already logged in
-    if (userID) {
-        const token = jwt.sign({ id: userID }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        req.session.userID = userID;
-        console.log('User is already logged in')
-        return res.json({ message: 'User is already logged in', token, userID });
-    }
-
-    // Validate username and password for new login attempt
-    if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
-    }
 
     try {
-        const user = await findUserByUsername(username);
+        // Check if user is already logged in
+        if (userID) {
+            const token = jwt.sign({ id: userID }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            req.session.userID = userID;
+            console.log('User is already logged in')
+            return res.json({ message: 'User is already logged in', token, userID });
+        }
 
-        if (!user) {
+        // Validate username and password for new login attempt
+        if (!username || !password) {
+            return res.status(400).json({ message: "Username and password are required" });
+        }
+
+
+        const findUser = await findUserByUsername(username);
+        const user = findUser[0];
+
+        if (user.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
 

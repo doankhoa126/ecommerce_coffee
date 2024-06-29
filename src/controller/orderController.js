@@ -1,5 +1,6 @@
-import { getShoppingCart } from "../models/orderModel.js";
+import { checkProductBeforeAdd, getShoppingCart, updateProduct } from "../models/orderModel.js";
 
+// get shopping cart
 export const getCart = async (req, res) => {
     // const userID = req.body.userID
     const userID = 19
@@ -19,4 +20,26 @@ export const getCart = async (req, res) => {
         res.status(500).json({ message: "Error getting shopping cart", error });
     }
 
+}
+
+// add product to shopping cart
+export const addProductToShoppingCart = async (req, res) => {
+    try {
+        const { quantity, price, productID, shoppingCartID } = req.body;
+
+        const productExists = await checkProductBeforeAdd(productID, shoppingCartID)
+        if (productExists) {
+            console.log("Product already exists")
+            const newQuantity = productExists.quantity + 1
+
+            const updatedQuantity = await updateProduct(newQuantity, productID, shoppingCartID)
+
+            if(updatedQuantity){
+                return res.status(200).json({message:"Product updated successfully", newProduct: updateProduct})
+            }
+            return res.status(200).json({ message: "Product already exists in the cart" })
+        }
+    } catch (error) {
+        console.log("Error adding product to shopping cart" + error.message)
+    }
 }
