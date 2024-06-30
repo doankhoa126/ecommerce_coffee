@@ -8,7 +8,7 @@ import Register from "./pages/register/register";
 import ForgotPassword from "./pages/forgotPassword/forgotPassword";
 import DetailProduct from "./pages/detaiProduct/detailProduct";
 import ShoppingCart from "./pages/shoppingCart/shoppingCart";
-import OrderCheckout from "./pages/orderCheckout/oderCheckout";
+import OrderCheckout from "./pages/orderCheckout/orderCheckout";
 
 const renderUserRouter = () => {
   const userRouter = [

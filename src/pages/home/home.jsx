@@ -7,6 +7,7 @@ import { Box, CardActionArea, Grid, Pagination } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useParams, useNavigate } from 'react-router-dom';
+import { fetchProducts } from '../../api_services/product';
 
 export default function HomePage() {
     const [products, setProducts] = React.useState([]);
@@ -28,32 +29,19 @@ export default function HomePage() {
     }
 
     React.useEffect(() => {
-        const fetchProducts = async () => {
+        const loadProducts = async () => {
             try {
-                const response = await fetch(`http://192.168.1.36:3000/api/products/getAllProducts?page=${currentPage}&perPage=${perPage}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-             
-                if (data.message === "Product found" && Array.isArray(data.products)) {
-                    setProducts(data.products);
-                    setTotalProducts(data.total_product || 0);
-                } else {
-                    throw new Error('Unexpected response format');
-                }
+                const data = await fetchProducts(currentPage, perPage);
+                setProducts(data.products);
+                setTotalProducts(data.totalProducts);
             } catch (error) {
                 setError(error.message);
                 console.error('Error fetching data:', error);
             }
         };
-    
-        fetchProducts();
+
+        loadProducts();
     }, [currentPage, perPage]);
-    
-    
 
     function formatPrice(price) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -62,9 +50,12 @@ export default function HomePage() {
     const handlePageChange = (event, value) => {
         navigate(`/home/${value}&${perPage}`);
     };
-    
+
+    const handleProductClick = (productId) => {
+        navigate(`/product-detail/${productId}`);
+    };
+
     return (
-        
         <Box sx={{ width: "80%", margin: "0 auto", mb: "40px" }}>
             <Box component="img"
                 src="https://asplynrorebnsajukbnu.supabase.co/storage/v1/object/public/image_coffee_web/slideshow.webp?t=2024-06-20T03%3A41%3A26.881Z"
@@ -92,11 +83,11 @@ export default function HomePage() {
                         {products.map((product, index) => (
                             <Grid item xs={12} sm={6} md={4} key={index}>
                                 <Card sx={{ height: '100%' }}>
-                                    <CardActionArea>
+                                    <CardActionArea onClick={() => handleProductClick(product.id)}>
                                         <CardMedia
                                             component="img"
                                             sx={{ height: 200 }}
-                                            image={product.imgURL || 'default-image-url.jpg'}
+                                            image={product.img_url || 'default-image-url.jpg'}
                                             alt={product.name || 'No name available'}
                                         />
                                         <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
@@ -118,11 +109,9 @@ export default function HomePage() {
                             </Grid>
                         ))}
                     </Grid>
-                   
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 2 }}>
                         <Pagination
                             count={Math.ceil(totalProducts / perPage)}
-                            
                             page={currentPage}
                             onChange={handlePageChange}
                             color="primary"

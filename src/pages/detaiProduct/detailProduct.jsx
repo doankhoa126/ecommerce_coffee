@@ -10,7 +10,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import { fetchProductDetails } from '../../api_services/product';
 const Img = styled('img')({
   margin: 'auto',
   display: 'block',
@@ -21,16 +21,19 @@ const Img = styled('img')({
 const DetailProduct = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [error, setError] = React.useState(null);
 
-  useEffect(() => {
-    fetch(`http://192.168.1.36:3000/api/products/getProductDetails/${id}`)
-      .then(response => response.json())
-      .then(data => {
-        setProduct(data.product[0]);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the product data!', error);
-      });
+  React.useEffect(() =>{
+    const loadProductDetails = async() =>{
+      try{
+        const data = await fetchProductDetails(id)
+        setProduct(data);
+      }catch (error){
+        setError(error.message);
+        console.error('Error fetching data:', error);
+      }
+    };
+    loadProductDetails();
   }, [id]);
 
   if (!product) {
@@ -54,7 +57,7 @@ const DetailProduct = () => {
       <Grid container spacing={2}>
         <Grid item>
           <ButtonBase sx={{ width: 400, height: 500 }}>
-            <Img alt={product.name} src={product.imgURL} />
+            <Img alt={product.name} src={product.img_url} />
           </ButtonBase>
         </Grid>
         <Grid item xs={12} sm container>

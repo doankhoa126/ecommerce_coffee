@@ -17,8 +17,6 @@ import {
 } from "@mui/material";
 import MyForm from "../../component/formInput";
 
-axios.defaults.baseURL = "http://localhost:3000"
-
 const Register = () => {
   const [formData, setFormData] = useState({
     fullname: '',
@@ -48,37 +46,19 @@ const Register = () => {
       gender: formData.gender,
       birthday: formData.birthday,
       email: formData.email,
-      phone: formData.phone,
       password: formData.password,
     };
 
     axios.post('/api/users/register', data)
-  .then((response) => {
-    if (response.data.success) {
-      alert("Register success!");
-      console.log(response.data); // Log response data if needed
-    } else {
-      alert("Registration failed: " + response.data.message); // Display specific error message from server
-    }
-  })
-  .catch((error) => {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      if (error.response.status === 409) {
-        alert("Registration failed: Conflict - Username or email already exists.");
-      } else {
-        alert("Registration failed: " + error.response.data.message);
-      }
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error("No response received:", error.request);
-      alert("Registration failed: No response received from server.");
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error("Error setting up request:", error.message);
-      alert("Registration failed: Error setting up request.");
-    }
-  });
+      .then((response) => {
+        if (response.success) {
+          alert("Register success!");
+          console.log(response.data)
+        }
+      })
+      .catch((error) => {
+        alert("Error: " + error.message)
+      })
   }
 
   return (
