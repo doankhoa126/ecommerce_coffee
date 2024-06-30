@@ -56,3 +56,21 @@ export async function getProductById(id) {
         throw error
     }
 }
+
+// add new product
+export async function addProduct(product) {
+    try {
+        const { data, error } = await supabase
+            .from('product')
+            .insert([product])
+            .select()
+
+        if (error) {
+            throw error
+        }
+        return data
+    } catch (error) {
+        console.error("Error adding product:", error.message);
+        throw error;
+    }
+}
