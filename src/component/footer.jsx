@@ -72,7 +72,7 @@ const Footer = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: isMobile ? '20px' : 0 }}>
                 <Box
                     component="img"
-                    src="https://asplynrorebnsajukbnu.supabase.co/storage/v1/object/public/image_coffee_web/footer_payment.png?t=2024-06-19T16%3A28%3A06.384Z"
+                    src="https://vfxqlimpalwlebgektea.supabase.co/storage/v1/object/public/img_coffee_web/footer_payment.png?t=2024-06-30T10%3A56%3A52.896Z"
                     alt="Payment Methods"
                     sx={{ width: isMobile ? '200px' : '300px', height: 'auto', ml: isMobile ? 0 : '30vh' }}
                 />

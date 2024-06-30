@@ -18,38 +18,48 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router';
+import { fetchShoppingCart } from '../../api_services/shopping_cart';
 
 const TAX_RATE = 0.05;
 
-
-
-function priceRow(qty, unit) {
-    return qty * unit;
-}
-
-function createRow(desc, qty, unit) {
-    const price = priceRow(qty, unit);
-    return { desc, qty, unit, price, isChecked: false };
-}
-
-function subtotal(items) {
-    return items.filter(item => item.isChecked).reduce((sum, item) => sum + item.price, 0);
-}
-
-const initialRows = [
-    createRow('Paperclips (Box)', 1, 10000),
-    createRow('Paper (Case)', 1, 20000),
-    createRow('Waste Basket', 1, 30000),
-];
-
 export default function ShoppingCart() {
-    const [items, setItems] = React.useState(initialRows);
+    const [items, setItems] = React.useState([]);
     const [deleteConfirmation, setDeleteConfirmation] = React.useState({ open: false, index: -1 });
     const navigate = useNavigate(); // Initialize useHistory
 
     // Update taxes and total based on checked items
     const invoiceTaxes = TAX_RATE * subtotal(items);
     const invoiceTotal = invoiceTaxes + subtotal(items);
+
+    React.useEffect(() => {
+        const loadShoppingCart = async () => {
+            try {
+                const response = await fetchShoppingCart(); // Assume fetchShoppingCart fetches data from API
+                if (response.message === 'Cart found') {
+                    setItems(response.carts.map(cart => ({
+                        desc: cart.name,
+                        qty: cart.quantity,
+                        unit: cart.price / cart.quantity, // Assuming unit price calculation
+                        price: cart.price,
+                        isChecked: false
+                    })));
+                }
+            } catch (error) {
+                console.error('Error loading shopping cart:', error);
+                // Handle error loading shopping cart data
+            }
+        };
+
+        loadShoppingCart();
+    }, []);
+
+    function priceRow(qty, unit) {
+        return qty * unit;
+    }
+
+    function subtotal(items) {
+        return items.filter(item => item.isChecked).reduce((sum, item) => sum + item.price, 0);
+    }
 
     const handleCheckboxChange = (index) => (event) => {
         const newItems = [...items];
@@ -85,7 +95,7 @@ export default function ShoppingCart() {
     };
 
     return (
-        <Box sx={{ height: 'auto', width: "80%", ml: "10%", mt: "4vh", mb:"8px" }}>
+        <Box sx={{ height: 'auto', width: "80%", ml: "10%", mt: "4vh", mb: "8px" }}>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 700 }} aria-label="spanning table">
                     <TableHead>
@@ -151,7 +161,7 @@ export default function ShoppingCart() {
                         </TableRow>
                         <TableRow>
                             <TableCell colSpan={5} align="right">
-                                <Button variant="contained" sx={{ backgroundColor: '#006F45',height:"8vh" }} onClick={handlePlaceOrder}>
+                                <Button variant="contained" sx={{ backgroundColor: '#006F45', height: "8vh" }} onClick={handlePlaceOrder}>
                                     Place Order
                                 </Button>
 

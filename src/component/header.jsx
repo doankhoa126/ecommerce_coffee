@@ -133,7 +133,7 @@ const Header = () => {
                
                 <Box 
                     component="img"
-                    src="https://asplynrorebnsajukbnu.supabase.co/storage/v1/object/public/image_coffee_web/logo.png?t=2024-06-19T08%3A15%3A42.427Z"
+                    src="https://vfxqlimpalwlebgektea.supabase.co/storage/v1/object/public/img_coffee_web/logo.png?t=2024-06-30T10%3A57%3A09.485Z"
                     alt="Logo"
                     sx={{
                         width: {

@@ -3,7 +3,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { Box, CardActionArea, Grid, Pagination } from '@mui/material';
+import { Box, Button, CardActionArea, Grid, Pagination, CircularProgress } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -12,6 +12,7 @@ import { fetchProducts } from '../../api_services/product';
 export default function HomePage() {
     const [products, setProducts] = React.useState([]);
     const [totalProducts, setTotalProducts] = React.useState(0);
+    const [loading, setLoading] = React.useState(true); // State for loading indicator
     const [error, setError] = React.useState(null);
     const { pageParams } = useParams();
     const navigate = useNavigate();
@@ -31,12 +32,15 @@ export default function HomePage() {
     React.useEffect(() => {
         const loadProducts = async () => {
             try {
+                setLoading(true); // Start loading indicator
                 const data = await fetchProducts(currentPage, perPage);
                 setProducts(data.products);
                 setTotalProducts(data.totalProducts);
+                setLoading(false); // Stop loading indicator after data is fetched
             } catch (error) {
                 setError(error.message);
                 console.error('Error fetching data:', error);
+                setLoading(false); // Stop loading indicator on error
             }
         };
 
@@ -55,10 +59,17 @@ export default function HomePage() {
         navigate(`/product-detail/${productId}`);
     };
 
+    const handleFavoriteClick = (event, productId) => {
+        // Prevent navigation when clicking on the Favorite icon
+        event.stopPropagation();
+        // Handle favorite functionality here
+        console.log('Favorite clicked for product id:', productId);
+    };
+
     return (
         <Box sx={{ width: "80%", margin: "0 auto", mb: "40px" }}>
             <Box component="img"
-                src="https://asplynrorebnsajukbnu.supabase.co/storage/v1/object/public/image_coffee_web/slideshow.webp?t=2024-06-20T03%3A41%3A26.881Z"
+                src="https://vfxqlimpalwlebgektea.supabase.co/storage/v1/object/public/img_coffee_web/slideshow.webp?t=2024-06-30T10%3A57%3A31.386Z"
                 alt="Slideshow"
                 sx={{
                     width: "100%",
@@ -73,7 +84,11 @@ export default function HomePage() {
                     New Products
                 </Typography>
             </Box>
-            {error ? (
+            {loading ? ( // Show loading indicator if loading is true
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 2 }}>
+                    <CircularProgress />
+                </Box>
+            ) : error ? ( // Show error message if error is not null
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 2 }}>
                     <Typography color="error">Error: {error}</Typography>
                 </Box>
@@ -99,8 +114,12 @@ export default function HomePage() {
                                                     {product.price ? formatPrice(product.price) : 'No price available'}
                                                 </Typography>
                                                 <Box>
-                                                    <FavoriteBorderIcon />
-                                                    <AddShoppingCartIcon sx={{ ml: "10px" }} />
+                                                    <Button onClick={(event) => handleFavoriteClick(event, product.id)}>
+                                                        <FavoriteBorderIcon />
+                                                    </Button>
+                                                    <Button onClick={() => navigate(`/cart/${product.id}`)}>
+                                                        <AddShoppingCartIcon/>
+                                                    </Button>
                                                 </Box>
                                             </Box>
                                         </CardContent>

@@ -9,8 +9,8 @@ import Button from '@mui/material/Button';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
 import { fetchProductDetails } from '../../api_services/product';
+import ProgressBars from '../../middleware/process';
 const Img = styled('img')({
   margin: 'auto',
   display: 'block',
@@ -38,7 +38,7 @@ const DetailProduct = () => {
 
   if (!product) {
     return <Box sx={{ display: 'flex' ,justifyContent:"center" }}>
-    <CircularProgress />
+    <ProgressBars />
   </Box>
   }
 
