@@ -1,51 +1,30 @@
 import supabase from '../config/connectDB.js'
 
-// load data into shoppping cart
-export async function getAllProductInShoppingCart(userID) {
+// get shopping cart bu ID
+export async function getShoppingCartById(userID) {
     try {
-        // const { data: shopping_cart, err } = await supabase
-        //     .from("shopping_cart")
-        //     .select()
-        //     .eq("user_id", userID);
+        const {data, error} = await supabase
+        .from("shopping_cart")
+        .select()
+        .eq("user_id", userID)
 
-        // if (err) {
-        //     throw error;
-        // }
+        if(error){
+            throw error
+        }
 
-        // if (shopping_cart.length === 0) {
-        //     throw new Error("No find shopping cart")
-        // }
-        // console.log(shopping_cart)
-
-        // const cartID = shopping_cart[0].id
-        // console.log(cartID)
-
-        // const { data: cartItems, error } = await supabase
-        //     .from("cart_items")
-        //     .select()
-        //     .eq("shopping_cart_id", cartID)
-        // if (error) {
-        //     throw error
-        // }
-        // if (cartItems.length === 0) {
-        //     throw new Error("No find product in shopping cart")
-        // }
-
-        // // Lấy thông tin chi tiết của các sản phẩm từ bảng product
-        // const productIDs = cartItems.map(item => item.product_id);
-        // const { data: products, error: productsError } = await supabase
-        //     .from("product")
-        //     .select()
-        //     .in("id", productIDs); // Lọc bởi các product_id đã lấy được từ cart_items
-
-        // if (productsError) {
-        //     throw productsError;
-        // }
-        // console.log(products)
-        // return products;
+        return data
+    } catch (error) {
+        console.error("Error getting shopping cart by ID", error.message)
+        throw error
+    }
+}
+// load data into shoppping cart
+export async function getAllProductInShoppingCart(shoppingCartID) {
+    try {
         const { data, error } = await supabase
             .from("cart_items")
             .select("name, quantity, price")
+            .eq("shopping_cart_id", shoppingCartID)
 
             if(error){
                 throw error;
@@ -115,5 +94,25 @@ export async function updateProduct(newdata, productID, shoppingCartID) {
         return data
     } catch (error) {
         console.error("Error update product quantity", error)
+    }
+}
+
+// delete product from cart_items
+export async function deleteProduct(productID, shoppingCartID) {
+    try {
+        const { data, error } = await supabase
+            .from("cart_items")
+            .delete()
+            .eq("product_id", productID)
+            .eq("shopping_cart_id", shoppingCartID)
+            .select()
+
+        if (error) {
+            throw error
+        }
+        console.log(data)
+        return data
+    } catch (error) {
+        console.error("Error delete product from shopping cart", error)
     }
 }

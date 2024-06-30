@@ -1,6 +1,7 @@
-import { addUser, findUserByUsername, updateUserPassword } from "../models/userModel.js";
+import { addUser, findUserByUsername, getUserByUserID, updateUserPassword } from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { getShoppingCartById } from "../models/orderModel.js";
 
 export const registerUser = async (req, res) => {
     const { fullname, gender, username, password, email, phone, birthday } = req.body;
@@ -37,14 +38,30 @@ export const loginUser = async (req, res) => {
     const { username, password, rememberMe } = req.body;
 
     const userID = req.cookies.userID;
+    console.log("User ID: " + userID)
 
     try {
         // Check if user is already logged in
         if (userID) {
-            const token = jwt.sign({ id: userID }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            req.session.userID = userID;
-            console.log('User is already logged in')
-            return res.json({ message: 'User is already logged in', token, userID });
+            const getUser = await getUserByUserID(userID)
+
+            if (getUser.length > 0) {
+                const checkUsername = getUser[0].username
+                if (checkUsername === username) {
+                    const token = jwt.sign({ id: userID }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                    const shoppingCartData = await getShoppingCartById(userID)
+                    console.log("Shopping Cart Data: " + shoppingCartData)
+                    const shoppingCartID = shoppingCartData[0].id
+                    res.cookie('shoppingCartID', shoppingCartID, {
+                        maxAge: 3600000 * 24, // 24 hours expiration
+                        // httpOnly: true // Only accessible via HTTP(S
+                    })
+                    console.log('User is already logged in')
+                    return res.json({ message: 'User is already logged in', token, userID });
+                }
+            }
+
+
         }
 
         // Validate username and password for new login attempt
@@ -54,6 +71,10 @@ export const loginUser = async (req, res) => {
 
 
         const findUser = await findUserByUsername(username);
+
+        if(findUser.length === 0){
+            return res.status(404).json({ message: 'User not found' });
+        }
         const user = findUser[0];
 
         if (user.length === 0) {
@@ -86,13 +107,20 @@ export const loginUser = async (req, res) => {
             console.log('Setting cookie for user: ', user.id);
             res.cookie('userID', user.id, {
                 maxAge: 3600000 * 24, // 24 hours expiration
-                httpOnly: true, // Only accessible via HTTP(S)
-                sameSite: 'none', // Adjust based on your requirements
-                secure: true // Recommend for production use over HTTPS
+                // httpOnly: true // Only accessible via HTTP(S)
+
             });
         }
 
-        req.session.userID = user.id;
+        const shoppingCartData = await getShoppingCartById(user.id)
+        const shoppingCartID = shoppingCartData[0].id
+        console.log("shoppingCartID: ", shoppingCartID)
+        res.cookie('shoppingCartID', shoppingCartID, {
+            maxAge: 3600000 * 24, // 24 hours expiration
+            // httpOnly: true // Only accessible via HTTP(S)
+
+        })
+
         res.json({ message: 'Login successful', token });
 
     } catch (error) {

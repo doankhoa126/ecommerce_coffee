@@ -1,17 +1,18 @@
-import { addProductToCartItems, checkProductBeforeAdd, getAllProductInShoppingCart, updateProduct } from "../models/orderModel.js";
+import { addProductToCartItems, checkProductBeforeAdd, deleteProduct, getAllProductInShoppingCart, updateProduct } from "../models/orderModel.js";
 import { getProductById } from "../models/productModel.js";
 
 // get shopping cart
 export const getShoppingCart = async (req, res) => {
-    const userID = 16
-    const userIDs = req.cookies.userID;
-    console.log(userID + " " + userIDs)
+    // const shoppingCartID = 11
 
-    if (!userID) return res.status(403).json({ message: "userID is required" })
+    // const { shoppingCartID } = req.params;
+    const shoppingCartID = req.cookies.shoppingCartID;
+
+    console.log(shoppingCartID)
 
     try {
-        const carts = await getAllProductInShoppingCart(userID);
-        console.log(carts)
+        const carts = await getAllProductInShoppingCart(shoppingCartID);
+
         if (carts.length === 0) {
             return res.status(404).json({ message: "No cart found" })
         }
@@ -25,21 +26,20 @@ export const getShoppingCart = async (req, res) => {
 // add product to shopping cart
 export const createNewProductToCartItems = async (req, res) => {
     try {
-        const { quantity, price, productID, shoppingCartID } = req.body;
+        const { quantity, productID, shoppingCartID } = req.body;
 
         const productExists = await checkProductBeforeAdd(productID, shoppingCartID)
-        const getNameProduct = await getProductById(productID)
-
         const getData = productExists[0]
-        const dataNameProduct = getNameProduct[0]
+
+        const getProduct = await getProductById(productID)
+        const dataProduct = getProduct[0]
+        const priceProduct = dataProduct.price
+        console.log(priceProduct)
 
         if (productExists.length > 0) {
             console.log("Product already exists")
             const newQuantity = getData.quantity + quantity
-            const newPrice = getData.price + price*quantity
-            
-
-            console.log(newQuantity, newPrice)
+            const newPrice = getData.price + priceProduct * quantity
 
             const data = {
                 quantity: newQuantity,
@@ -53,9 +53,9 @@ export const createNewProductToCartItems = async (req, res) => {
             }
         } else {
             const data = {
-                name: dataNameProduct.name,
+                name: dataProduct.name,
                 quantity: quantity,
-                price: price * quantity,
+                price: priceProduct * quantity,
                 product_id: productID,
                 shopping_cart_id: shoppingCartID
             }
@@ -69,5 +69,24 @@ export const createNewProductToCartItems = async (req, res) => {
 
     } catch (error) {
         console.log("Error adding product to shopping cart" + error.message)
+        return res.status(500).json({ message: "Error adding product to shopping cart", error });
+    }
+}
+
+export const deleteProductFromCartItems = async (req, res) =>{
+    try {
+        const {productID} = req.params
+        const shoppingCartID = req.cookies.shoppingCartID
+
+        console.log(productID)
+        console.log("shoppingCartId: " + shoppingCartID)
+
+        const deletedProduct = await deleteProduct(productID, shoppingCartID)
+        if(!deletedProduct){
+            return res.status(404).json({ message: "Product not found in cart" })
+        }
+        return res.status(200).json({ message: "Product deleted successfully" })
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting product from cart", error });
     }
 }

@@ -17,7 +17,7 @@ app.use(session({
   cookie: { secure: false } // Set to true if using HTTPS
 }));
 app.use(cors({
-  origin: 'http://localhost:3001', // Your client's URL
+  origin: ['http://localhost:3001', 'http://localhost:3000', 'http://192.168.1.39:3000'],
   credentials: true // Enable sending cookies cross-origin
 }));
 app.use(bodyParser.json());

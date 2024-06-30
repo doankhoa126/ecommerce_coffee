@@ -80,3 +80,22 @@ export async function updateUserPassword(username, newPassword) {
         throw error;
     }
 }
+
+// get user by userID
+export async function getUserByUserID(userID) {
+    try {
+        const {data, error} = await supabase
+        .from("user")
+        .select()
+        .eq("id", userID)
+
+        if(error){
+            throw error
+        }
+
+        return data
+    } catch (error) {
+        console.log("Error getting user", error.message)
+        throw error
+    }
+}
